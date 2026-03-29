@@ -1,0 +1,2 @@
+biome check --write src/
+grep -rn "biome-ignore" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --include="*.json" --include="*.css" src/ && echo "ERROR: biome-ignore comments are not allowed" && exit 1 || true

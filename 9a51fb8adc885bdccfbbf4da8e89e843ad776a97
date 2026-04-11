@@ -1,0 +1,23 @@
+.github/workflows/claude-code-review.yml
+  5f853a415b2a6177 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "9a51fb8adc885bdccfbbf4da8e89e843ad776a97",
+  "prompts": {
+    "5f853a415b2a6177": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19eeaea6-2f8b-4355-85c0-eacfb5a4c2df",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ryo Takahashi",
+      "messages": [],
+      "total_additions": 50,
+      "total_deletions": 49,
+      "accepted_lines": 37,
+      "overriden_lines": 1
+    }
+  }
+}

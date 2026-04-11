@@ -1,0 +1,27 @@
+.github/workflows/claude-code-review.yml
+  00a01932b2be30a4 21-22
+.github/actions/setup-safe-chain/action.yml
+  00a01932b2be30a4 1-9
+.github/workflows/claude.yml
+  00a01932b2be30a4 33-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "823cbcc32f99e439a2dbaabeb26baa8f2a7d9743",
+  "prompts": {
+    "00a01932b2be30a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c20787ba-5550-48dc-8ee4-3ea318b06ec3",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ryo Takahashi",
+      "messages": [],
+      "total_additions": 111,
+      "total_deletions": 102,
+      "accepted_lines": 84,
+      "overriden_lines": 1
+    }
+  }
+}

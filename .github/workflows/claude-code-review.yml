@@ -18,6 +18,9 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Install Aikido Safe Chain
+        uses: ./.github/actions/setup-safe-chain
+
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1

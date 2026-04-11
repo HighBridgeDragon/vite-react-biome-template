@@ -1,0 +1,9 @@
+name: Setup Aikido Safe Chain
+description: サプライチェーン保護のためAikido Safe Chainをインストール（バージョン固定）
+
+runs:
+  using: composite
+  steps:
+    - name: Install Aikido Safe Chain
+      run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/download/1.4.7/install-safe-chain.sh | sh -s -- --ci
+      shell: bash

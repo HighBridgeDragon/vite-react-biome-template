@@ -1,0 +1,31 @@
+{
+	"$schema": "https://json.schemastore.org/claude-code-settings.json",
+	"hooks": {
+		"PreToolUse": [
+			{
+				"matcher": "Edit|Write",
+				"hooks": [
+					{
+						"type": "command",
+						"shell": "bash",
+						"statusMessage": "機微ファイルの編集を確認中…",
+						"command": "jq -r '.tool_input.file_path // empty' | tr -d '\\r' | { read -r f; b=$(basename \"$f\"); case \"$b\" in .env|.env.*|bun.lock) jq -nc --arg b \"$b\" '{hookSpecificOutput:{hookEventName:\"PreToolUse\",permissionDecision:\"deny\",permissionDecisionReason:($b+\" は機微ファイル/ロックファイルのため自動編集をブロックしました。手動編集が必要な場合はユーザーが直接行ってください。\")}}';; esac; }"
+					}
+				]
+			}
+		],
+		"PostToolUse": [
+			{
+				"matcher": "Edit|Write",
+				"hooks": [
+					{
+						"type": "command",
+						"shell": "bash",
+						"statusMessage": "biome で整形中…",
+						"command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | tr -d '\\r' | { read -r f; case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.json|*.jsonc|*.css) bunx @biomejs/biome check --write \"$f\";; esac; } 2>/dev/null || true"
+					}
+				]
+			}
+		]
+	}
+}

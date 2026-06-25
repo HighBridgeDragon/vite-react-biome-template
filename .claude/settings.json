@@ -22,7 +22,7 @@
 						"type": "command",
 						"shell": "bash",
 						"statusMessage": "biome で整形中…",
-						"command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | tr -d '\\r' | { read -r f; case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.json|*.jsonc|*.css) bunx @biomejs/biome check --write \"$f\";; esac; } 2>/dev/null || true"
+						"command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | tr -d '\\r' | { read -r f; case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.json|*.jsonc|*.css) b=node_modules/.bin/biome; [ -f \"$b\" ] || b=\"$b.exe\"; [ -f \"$b\" ] && \"$b\" check --write \"$f\";; esac; } 2>/dev/null || true"
 					}
 				]
 			}

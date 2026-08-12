@@ -1,0 +1,21 @@
+root-hook-test.ts
+  s_63b492b5dbab6e::t_b401aa4c9a4df0 1
+src/hook-test.ts
+  s_63b492b5dbab6e::t_c4b9df4c4e115a 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ac98a337e1d18ae649567b589bac4d55d39105ac",
+  "prompts": {},
+  "sessions": {
+    "s_63b492b5dbab6e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b8cab28d-9054-42fd-b27a-e912c6bc28a6",
+        "model": "unknown"
+      },
+      "human_author": "Ryo Takahashi <38057616+HighBridgeDragon@users.noreply.github.com>"
+    }
+  }
+}

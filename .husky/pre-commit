@@ -1,2 +1,13 @@
-biome check --write src/
-grep -rn "biome-ignore" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --include="*.json" --include="*.css" src/ && echo "ERROR: biome-ignore comments are not allowed" && exit 1 || true
+# ステージされたファイルに Biome を適用する。対象ファイルの列挙と、部分ステージ時の
+# 未ステージ変更の退避・復元、および修正結果の再ステージは lint-staged が行う。
+lint-staged
+
+# biome-ignore による抑制はリポジトリ全体で許可しない。
+# コミットされる内容を検査するため index（--cached）を対象にする。
+# 拡張子は lint-staged 側の "*" が biome check に渡す範囲と揃える。
+if git grep --cached -n "biome-ignore" -- \
+	'*.ts' '*.tsx' '*.mts' '*.cts' '*.js' '*.jsx' '*.mjs' '*.cjs' \
+	'*.json' '*.jsonc' '*.css' '*.html'; then
+	echo "ERROR: biome-ignore comments are not allowed"
+	exit 1
+fi

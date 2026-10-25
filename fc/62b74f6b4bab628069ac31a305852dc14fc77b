@@ -1,0 +1,18 @@
+.husky/pre-push
+  h_f91a6a8a277de2 24-25,28,31,34,37-48
+scripts/audit-bun.test.ts
+  h_f91a6a8a277de2 94-102,151-169
+scripts/audit-bun.ts
+  h_f91a6a8a277de2 30-31,94,97,103,116-119,169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fc62b74f6b4bab628069ac31a305852dc14fc77b",
+  "prompts": {},
+  "humans": {
+    "h_f91a6a8a277de2": {
+      "author": "Ryo Takahashi <38057616+HighBridgeDragon@users.noreply.github.com>"
+    }
+  }
+}

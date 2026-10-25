@@ -52,6 +52,7 @@ Husky によるローカルフックを設定しています。
   - `bun.lock` の変更時: `bun audit --audit-level=critical` を実行し、Critical 脆弱性があれば push を中断します。
   - `mise.toml` の変更時: 上流リポジトリ（`oven-sh/bun`）の公開 Advisory と照合し、High 以上の脆弱性があれば push を中断します。
   - オフライン時や外部 API 障害時は、警告を表示した上で push を許可します。
+  - ※GitHub API の未認証レートリミット（60回/時）対策として、CI や共有 IP 環境では `GITHUB_TOKEN` または `GH_TOKEN` の環境変数設定を推奨します。
 
 ### フックのスキップ
 

@@ -161,3 +161,7 @@ sketch
 storybook-static/
 
 # End of https://www.toptal.com/developers/gitignore/api/node,react,storybookjs
+
+# Documentation managed in GitHub Issues
+docs/
+

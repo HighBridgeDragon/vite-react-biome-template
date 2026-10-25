@@ -1,0 +1,19 @@
+package.json
+  s_b7f5cb562abee8::t_cbcd312f045406 12-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "703f6bb3c738c0bc8ee65f8b74430d19e32e71e4",
+  "prompts": {},
+  "sessions": {
+    "s_b7f5cb562abee8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d7cc5f28-200d-4382-bbbb-ca4ed4463733",
+        "model": "unknown"
+      },
+      "human_author": "Ryo Takahashi <38057616+HighBridgeDragon@users.noreply.github.com>"
+    }
+  }
+}

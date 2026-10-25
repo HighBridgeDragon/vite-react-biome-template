@@ -91,6 +91,15 @@ bun   =   "1.4.4" # latest
 		expect(extractBunVersionFromToml(toml)).toBe("1.4.4");
 	});
 
+	it("コメント行や xbun などの別名にはマッチしない", () => {
+		const toml = `
+# bun = "1.0.0"
+xbun = "2.0.0"
+bun = "1.4.4"
+`;
+		expect(extractBunVersionFromToml(toml)).toBe("1.4.4");
+	});
+
 	it("bun 指定がない場合は null を返す", () => {
 		const toml = `
 [tools]
@@ -138,6 +147,25 @@ describe("checkAdvisories", () => {
 
 	it("修正版バージョン（1.4.4）では該当なしとなり hasCriticalOrHigh=false となる", () => {
 		const result = checkAdvisories("1.4.4", sampleAdvisories);
+		expect(result.hasCriticalOrHigh).toBe(false);
+		expect(result.matched.length).toBe(0);
+	});
+
+	it("package.name が bun 以外の場合は脆弱性があっても無視する", () => {
+		const otherAdvisories: Advisory[] = [
+			{
+				ghsa_id: "GHSA-other-0001",
+				summary: "Other package issue",
+				severity: "high",
+				vulnerabilities: [
+					{
+						package: { name: "other-tool" },
+						vulnerable_version_range: "< 2.0.0",
+					},
+				],
+			},
+		];
+		const result = checkAdvisories("1.4.3", otherAdvisories);
 		expect(result.hasCriticalOrHigh).toBe(false);
 		expect(result.matched.length).toBe(0);
 	});

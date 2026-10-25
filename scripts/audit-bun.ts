@@ -27,6 +27,8 @@ export function parseSemver(v: string): [number, number, number] {
 
 /**
  * 2 つのセマンティックバージョンを比較します。
+ * 注意: 本スクリプトは安定版（SemVer X.Y.Z）を想定しています。
+ * canary 等のプレリリース識別子は簡易比較（安定版より小さい扱い）となります。
  * v1 > v2 => 正の数, v1 < v2 => 負の数, v1 == v2 => 0
  */
 export function compareSemver(v1: string, v2: string): number {
@@ -89,14 +91,16 @@ export function parseVersionRange(range: string): (v: string) => boolean {
 
 /**
  * mise.toml の文字列から bun バージョンを抽出します。
+ * コメント行や別名（xbun など）に誤一致しないよう行頭で判定します。
  */
 export function extractBunVersionFromToml(content: string): string | null {
-	const match = content.match(/bun\s*=\s*["']([^"']+)["']/);
+	const match = content.match(/^\s*bun\s*=\s*["']([^"']+)["']/m);
 	return match ? match[1] : null;
 }
 
 /**
  * Advisory 一覧とバージョンを照合し、該当する Advisory を抽出します。
+ * 対象パッケージが bun 本体（または関連パッケージ）のものに限定して検査します。
  */
 export function checkAdvisories(
 	currentVersion: string,
@@ -109,6 +113,10 @@ export function checkAdvisories(
 		const vulns = advisory.vulnerabilities || [];
 		const isTargetVulnerable = vulns.some((vuln) => {
 			if (!vuln.vulnerable_version_range) return false;
+			const pkgName = vuln.package?.name?.toLowerCase();
+			if (pkgName && pkgName !== "bun" && !pkgName.includes("bun")) {
+				return false;
+			}
 			const isVulnerable = parseVersionRange(vuln.vulnerable_version_range);
 			return isVulnerable(currentVersion);
 		});
@@ -158,6 +166,7 @@ export async function auditBun(options: AuditBunOptions = {}): Promise<number> {
 
 	console.log(`[audit:bun] 検証対象の Bun バージョン: ${version}`);
 
+	// TODO: Advisory が 100 件を超えた場合は Link ヘッダーによるページネーション走査を検討
 	const apiUrl =
 		"https://api.github.com/repos/oven-sh/bun/security-advisories?state=published&per_page=100";
 	const headers: Record<string, string> = {

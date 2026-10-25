@@ -1,0 +1,83 @@
+#!/bin/sh
+
+# Bun が利用できない環境（GUI Git クライアント等）では警告を出してスキップする
+if ! command -v bun >/dev/null 2>&1; then
+	echo "[WARN] bun コマンドが見つからないため、セキュリティ監査をスキップします。"
+	exit 0
+fi
+
+CHECK_LOCK=0
+CHECK_BUN_VERSION=0
+
+ZERO_SHA="0000000000000000000000000000000000000000"
+
+# push されるすべての ref 行を処理（Windows Git Bash の \r 混入を除去）
+while read -r local_ref local_sha remote_ref remote_sha; do
+	local_sha=$(echo "$local_sha" | tr -d '\r')
+	remote_sha=$(echo "$remote_sha" | tr -d '\r')
+
+	# ブランチ削除時はスキップ
+	if [ "$local_sha" = "$ZERO_SHA" ] || [ -z "$local_sha" ]; then
+		continue
+	fi
+
+	# 差分ファイルの取得
+	if [ "$remote_sha" = "$ZERO_SHA" ]; then
+		# 新規ブランチ push 時: リモート未反映のコミット群から変更ファイル一覧を取得
+		COMMITS=$(git rev-list "$local_sha" --not --remotes 2>/dev/null)
+		if [ -n "$COMMITS" ]; then
+			CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $COMMITS 2>/dev/null)
+		else
+			# コミットが見つからない場合はブランチの直近ツリーを走査
+			CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "$local_sha" 2>/dev/null)
+		fi
+	else
+		# 通常更新時: リモートとローカルの差分を取得
+		CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "$remote_sha" "$local_sha" 2>/dev/null)
+	fi
+
+	if echo "$CHANGED_FILES" | grep -q "^bun\.lock$"; then
+		CHECK_LOCK=1
+	fi
+	if echo "$CHANGED_FILES" | grep -q "^mise\.toml$"; then
+		CHECK_BUN_VERSION=1
+	fi
+done
+
+# 1. 依存パッケージの脆弱性検査 (bun.lock 変更時)
+if [ "$CHECK_LOCK" -eq 1 ]; then
+	echo "[pre-push] bun.lock の変更を検知しました。依存パッケージの脆弱性を検査します..."
+	AUDIT_OUTPUT=$(bun audit --audit-level=critical 2>&1)
+	AUDIT_EXIT=$?
+
+	if [ "$AUDIT_EXIT" -ne 0 ]; then
+		# オフラインや通信エラー（error: POST ... など行頭に error: がある場合）は警告を出して通過
+		if echo "$AUDIT_OUTPUT" | grep -qE '^error:'; then
+			echo "[WARN] bun audit で通信エラーが発生しました。オフライン等のため push を許可します:"
+			echo "$AUDIT_OUTPUT"
+		else
+			echo "[ERROR] bun.lock に Critical レベルの脆弱性が検出されました。push を中断します:"
+			echo "$AUDIT_OUTPUT"
+			echo ""
+			echo "回避して push する必要がある場合は 'git push --no-verify' を使用してください。"
+			exit 1
+		fi
+	else
+		echo "[pre-push] bun.lock の Critical 脆弱性検査に合格しました。"
+	fi
+fi
+
+# 2. Bun ランタイム本体の脆弱性検査 (mise.toml 変更時)
+if [ "$CHECK_BUN_VERSION" -eq 1 ]; then
+	echo "[pre-push] mise.toml の変更を検知しました。固定された Bun の脆弱性を検査します..."
+	bun scripts/audit-bun.ts
+	BUN_AUDIT_EXIT=$?
+
+	if [ "$BUN_AUDIT_EXIT" -ne 0 ]; then
+		echo "[ERROR] 固定された Bun バージョンに重大な脆弱性が検出されたため、push を中断します。"
+		echo "回避して push する必要がある場合は 'git push --no-verify' を使用してください。"
+		exit 1
+	fi
+fi
+
+exit 0

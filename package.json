@@ -9,7 +9,11 @@
 		"format": "biome format --write .",
 		"check:fix": "biome check --write .",
 		"preview": "vite preview",
-		"prepare": "husky"
+		"prepare": "husky",
+		"test": "bun test",
+		"audit:deps": "bun audit --audit-level=critical",
+		"audit:tools": "bun scripts/audit-bun.ts",
+		"audit:all": "bun run audit:deps && bun run audit:tools"
 	},
 	"dependencies": {
 		"react": "^19.2.7",

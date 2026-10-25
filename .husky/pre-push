@@ -21,19 +21,31 @@ while read -r local_ref local_sha remote_ref remote_sha; do
 		continue
 	fi
 
+	CHANGED_FILES=""
+
 	# 差分ファイルの取得
 	if [ "$remote_sha" = "$ZERO_SHA" ]; then
-		# 新規ブランチ push 時: リモート未反映のコミット群から変更ファイル一覧を取得
+		# 新規ブランチ push 時: リモート未反映のコミット群から変更ファイル一覧を取得（マージコミット含む）
 		COMMITS=$(git rev-list "$local_sha" --not --remotes 2>/dev/null)
 		if [ -n "$COMMITS" ]; then
-			CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $COMMITS 2>/dev/null)
+			CHANGED_FILES=$(git log --name-only --pretty=format: $COMMITS 2>/dev/null | sort -u)
 		else
 			# コミットが見つからない場合はブランチの直近ツリーを走査
-			CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "$local_sha" 2>/dev/null)
+			CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r -m "$local_sha" 2>/dev/null)
 		fi
 	else
-		# 通常更新時: リモートとローカルの差分を取得
-		CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "$remote_sha" "$local_sha" 2>/dev/null)
+		# 通常更新時: remote_sha がローカルに存在するか確認（fetch 漏れや force push 対策）
+		if git cat-file -e "$remote_sha" 2>/dev/null; then
+			CHANGED_FILES=$(git log --name-only --pretty=format: "$remote_sha..$local_sha" 2>/dev/null | sort -u)
+		else
+			# remote_sha が存在しない場合はローカルの未 push コミットへフォールバック
+			COMMITS=$(git rev-list "$local_sha" --not --remotes 2>/dev/null)
+			if [ -n "$COMMITS" ]; then
+				CHANGED_FILES=$(git log --name-only --pretty=format: $COMMITS 2>/dev/null | sort -u)
+			else
+				CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r -m "$local_sha" 2>/dev/null)
+			fi
+		fi
 	fi
 
 	if echo "$CHANGED_FILES" | grep -q "^bun\.lock$"; then

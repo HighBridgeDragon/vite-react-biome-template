@@ -1,0 +1,14 @@
+bun.lock
+  h_f91a6a8a277de2 97,99,101,103,105,107,109,111,113,115,117,119,121,123,125,127,153,155,157,167,215,217,223,229,235,251,273-274
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ae14b76b5236bb863a54777641bcbdac5c7cda84",
+  "prompts": {},
+  "humans": {
+    "h_f91a6a8a277de2": {
+      "author": "Ryo Takahashi <38057616+HighBridgeDragon@users.noreply.github.com>"
+    }
+  }
+}
